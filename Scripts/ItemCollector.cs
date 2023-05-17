@@ -1,22 +1,25 @@
 using System.Collections;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
+using TMPro;
+using System;
 using UnityEngine.UI;
 
 public class ItemCollector : MonoBehaviour
 {
-    private int points = 0;
-    [SerializeField] private TMP_Text pointsText;
-    [SerializeField] private AudioSource collectsSoundEffect;
-    private void OnTriggerEnter2D (Collider2D collision)
+    int coins=0;
+    [SerializeField] AudioSource collectionSound;
+
+    [SerializeField] private TMP_Text coinsText;
+    
+    private void OnTriggerEnter(Collider other) 
     {
-        if (collision.gameObject.CompareTag("Star"))
+        if(other.gameObject.CompareTag("Coin"))
         {
-            Destroy(collision.gameObject);
-            collectsSoundEffect.Play();
-            points++;
-            pointsText.text = "Points : " + points;
+            Destroy(other.gameObject);
+            coins++;
+            coinsText.text="Coins "+coins;
+            collectionSound.Play();
         }
     }
 }

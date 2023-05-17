@@ -4,29 +4,22 @@ using UnityEngine;
 
 public class WayPointFollower : MonoBehaviour
 {
-    [SerializeField] private GameObject[] waypoints;
-    private int currentWaypointIndex = 0;
-    [SerializeField] private float speed = 2f;
-    private SpriteRenderer sprite;
+    [SerializeField] GameObject[] waypoints;
+    int wayPointIndex = 0;
 
-    private void Start()
+    [SerializeField] float speed = 1f;
+    void Update()
     {
-        sprite = GetComponent<SpriteRenderer>();
-    }
-    private void Update()
-    {
-        if (Vector2.Distance(waypoints[currentWaypointIndex].transform.position, transform.position) < .1f)
+        if(Vector3.Distance(transform.position, waypoints[wayPointIndex].transform.position)<.1f)
         {
-            currentWaypointIndex++;
-            if(currentWaypointIndex >= waypoints.Length)
+            wayPointIndex++;
+            if(wayPointIndex>=waypoints.Length)
             {
-                currentWaypointIndex = 0;
+                wayPointIndex=0;
             }
         }
-        if(currentWaypointIndex==0)
-            sprite.flipX = false;
-        else
-            sprite.flipX = true;
-        transform.position = Vector2.MoveTowards(transform.position, waypoints[currentWaypointIndex].transform.position, Time.deltaTime * speed);
+
+
+        transform.position = Vector3.MoveTowards(transform.position, waypoints[wayPointIndex].transform.position, speed*Time.deltaTime);
     }
 }

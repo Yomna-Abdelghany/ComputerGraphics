@@ -1,53 +1,57 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class PlayerLife : MonoBehaviour
 {
-    private Rigidbody2D rb;
-    private Animator anim;
-    private int lives = 3;
-    [SerializeField] private TMP_Text livesText;
-    [SerializeField] private AudioSource deathSoundEffect;
-    private void Start()
-    {
-        anim = GetComponent<Animator>();
-        rb = GetComponent<Rigidbody2D>();
+    PlayerHealth health;
+    bool dead=false;
+    [SerializeField] AudioSource deathSound;
+    [SerializeField] AudioSource enemydeathSound;
+    [SerializeField] AudioSource enemycollisionSound;
+
+
+    private void Start() {
+        health=GetComponent<PlayerHealth>();
     }
-    private void OnCollisionEnter2D(Collision2D collision)
+    
+
+    private void Update()
     {
-        if (collision.gameObject.CompareTag("Trap") || collision.gameObject.CompareTag("Traps"))
+        if(transform.position.y < -2f && !dead)
         {
-            if(lives>1)
-            {
-                deathSoundEffect.Play();
-                anim.SetBool("hurt",true);
-                lives--;
-                livesText.text = "Lives : " + lives;
-                Invoke("Reset", .5f);
-            }
-            else
-                Die();
+            Die();
+            deathSound.Play();
         }
     }
-    private void Reset()
+    private void OnCollisionEnter(Collision collision) 
     {
-        anim.SetBool("hurt",false);
+        if (collision.gameObject.CompareTag("EnemyBody"))
+        {
+            health.ChangeHealth(-collision.gameObject.GetComponent<PlayerHealth>().power);
+            enemycollisionSound.Play();
+            if(health.currentHealth<=0)
+            {
+            GetComponent<MeshRenderer>().enabled = false;
+            GetComponent<Rigidbody>().isKinematic = true;
+            GetComponent<PlayerMovemenet>().enabled = false;
+            enemydeathSound.Play();
+            Die();
+            }
+        }
     }
-
-
-
-    private void Die()
+    
+    void Die()
     {
-        deathSoundEffect.Play();
-        rb.bodyType = RigidbodyType2D.Static;
-        anim.SetTrigger("death");
+        
+        dead=true;
+        //Invoke(nameof(ReloadLevel), 1.3f);
+        SceneManager.LoadScene(5);
+        
     }
-    private void GameOver()
+    void ReloadLevel()
     {
-        SceneManager.LoadScene(6);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }
